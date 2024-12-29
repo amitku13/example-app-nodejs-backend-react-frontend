@@ -1,0 +1,27 @@
+name: Upload Files to S3
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+
+jobs:
+  upload_to_s3:
+    runs-on: ubuntu-latest  # Run the job on the latest Ubuntu environment
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Set up AWS credentials using OIDC (Assuming you've already configured AWS OIDC for GitHub)
+    - name: Configure AWS credentials using OIDC
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: arn:aws:iam::120569613442:role/amit_ec2,s3,cloudfront  # Replace with your IAM role ARN
+        aws-region: us-east-1  # Specify the region of your S3 bucket
+
+    # Step 3: Upload all files to the specified S3 bucket
+    - name: Upload files to S3
+      run: |
+        aws s3 sync . s3://my-unique-bucket-name-1989/ --exclude '.git/*' --exclude 'node_modules/*' --exclude '.github/*'
